@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "f09f3968-1988-4cda-a265-61326454863b",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "D:\\Projects\\Fraud_Detection_Fintech\\.archify\\architecture-fraud-detection-fintech-20261006-011354\\candidate.json",
+  "output": "D:\\Projects\\Fraud_Detection_Fintech\\.archify\\architecture-fraud-detection-fintech-20261006-011354\\fraud-detection-fintech.html",
+  "specification": {
+    "sha256": "a6b1bc800da77ed4eefee71d62beaa8b5accc1458916f73fdcd06f0dcb2b9eb1",
+    "bytes": 9844
+  },
+  "artifact": {
+    "sha256": "c8b7d937c42917d2d5c6ea6c91c9087f6e4e67d47100c0b710d59f4538f784cf",
+    "bytes": 785892
+  }
+}

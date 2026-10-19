@@ -1,0 +1,8 @@
+# Risk policy: fraud probability -> risk band -> decision.
+# Configurable, NOT hard-coded (section 21 of the blueprint).
+# Bands are evaluated in order; the first band with p <= max_p wins.
+bands:
+  - {name: LOW,      max_p: 0.30, decision: APPROVE}
+  - {name: MEDIUM,   max_p: 0.70, decision: REVIEW}
+  - {name: HIGH,     max_p: 0.90, decision: DECLINE}
+  - {name: CRITICAL, max_p: 1.01, decision: BLOCK}

@@ -1,0 +1,25 @@
+@import './styles/variables.css';
+@import './styles/global.css';
+@import './styles/sidebar.css';
+@import './styles/navbar.css';
+@import './styles/cards.css';
+@import './styles/tables.css';
+@import './styles/modal.css';
+@import './styles/charts.css';
+@import './styles/forms.css';
+@import './styles/dashboard.css';
+@import './styles/alerts.css';
+@import './styles/risk.css';
+@import './styles/analytics.css';
+@import './styles/model.css';
+@import './styles/prediction.css';
+@import './styles/pages.css';
+@import './styles/ui.css';
+@import './styles/responsive.css';
+@import './styles/landing.css';
+@import './styles/fintech.css';
+
+html,
+body {
+  min-height: 100%;
+}

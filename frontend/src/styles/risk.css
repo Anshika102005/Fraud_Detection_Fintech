@@ -1,0 +1,296 @@
+/* ============================================================
+   Risk Analysis / Investigation page styles
+   ============================================================ */
+
+.investigation-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.investigation-list {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+  padding: var(--space-4);
+  max-height: 720px;
+  overflow-y: auto;
+}
+
+.investigation-list-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--space-3);
+}
+
+.investigation-list-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+}
+
+.investigation-list-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.investigation-list-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.investigation-list-item.active {
+  border-color: var(--brand-primary);
+  background-color: var(--bg-accent-subtle);
+}
+
+.investigation-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.investigation-item-id {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.investigation-item-sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.investigation-item-time {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.investigation-main {
+  min-width: 0;
+}
+
+.investigation-panel {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+  padding: var(--space-5);
+}
+
+.investigation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.investigation-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.investigation-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.investigation-score-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  background-color: var(--bg-secondary);
+}
+
+.investigation-score-box {
+  flex: 0 0 180px;
+  text-align: center;
+  padding: var(--space-4);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+}
+
+.investigation-score-value {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  line-height: 1;
+}
+
+.investigation-score-max {
+  font-size: var(--text-base);
+  color: var(--text-muted);
+}
+
+.investigation-score-level {
+  font-size: var(--text-sm);
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: var(--space-2);
+  color: var(--text-secondary);
+}
+
+.investigation-fraud-prob {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.investigation-meter-box {
+  flex: 1;
+}
+
+.investigation-section-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: var(--space-4) 0 var(--space-3);
+}
+
+.behavior-comparison-table {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--bg-surface-alt);
+}
+
+.behavior-row {
+  display: contents;
+}
+
+.behavior-row span:first-child {
+  color: var(--text-secondary);
+}
+
+.behavior-now {
+  color: var(--text-primary);
+  font-weight: var(--font-semibold);
+}
+
+.behavior-then {
+  color: var(--text-muted);
+}
+
+.investigation-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.risk-distribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.risk-band {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.risk-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.risk-band-name {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.risk-band-value {
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.risk-factors-preview {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: var(--bg-secondary);
+}
+
+.risk-factor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.risk-reason-list {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.risk-reason-list li + li {
+  margin-top: 4px;
+}
+
+.risk-level-badge.low,
+.risk-level-badge.LOW {
+  background-color: var(--risk-low-bg);
+  color: var(--risk-low);
+}
+
+.risk-level-badge.medium,
+.risk-level-badge.MEDIUM {
+  background-color: var(--risk-medium-bg);
+  color: var(--risk-medium);
+}
+
+.risk-level-badge.high,
+.risk-level-badge.HIGH {
+  background-color: var(--risk-high-bg);
+  color: var(--risk-high);
+}
+
+.risk-level-badge.critical,
+.risk-level-badge.CRITICAL {
+  background-color: var(--risk-critical-bg);
+  color: var(--risk-critical);
+}
+
+@media (max-width: 1024px) {
+  .investigation-layout {
+    grid-template-columns: 1fr;
+  }
+}

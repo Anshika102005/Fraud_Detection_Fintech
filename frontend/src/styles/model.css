@@ -1,0 +1,175 @@
+/* ============================================================
+   Model Performance page styles
+   ============================================================ */
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.metric-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-value {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.metric-label {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: var(--space-1);
+}
+
+.confusion-matrix-card,
+.precision-card,
+.model-comparison-table {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--bg-surface);
+  padding: var(--space-5);
+}
+
+.confusion-matrix-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.confusion-grid {
+  display: grid;
+  grid-template-columns: 90px 1fr 1fr;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.cm-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  border-radius: 8px;
+  font-size: var(--text-sm);
+  background-color: var(--bg-surface-alt);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.cm-cell strong {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  display: block;
+}
+
+.cm-header {
+  font-weight: var(--font-semibold);
+  color: var(--text-muted);
+}
+
+.cm-header-positive {
+  background-color: var(--risk-high-bg);
+  color: var(--risk-high);
+  font-weight: var(--font-semibold);
+}
+
+.cm-header-negative {
+  background-color: var(--risk-low-bg);
+  color: var(--risk-low);
+  font-weight: var(--font-semibold);
+}
+
+.cm-tp {
+  background-color: var(--risk-high-bg);
+  color: var(--risk-high);
+}
+
+.cm-fp {
+  background-color: var(--risk-medium-bg);
+  color: var(--risk-medium);
+}
+
+.cm-fn {
+  background-color: var(--risk-medium-bg);
+  color: var(--risk-medium);
+}
+
+.cm-tn {
+  background-color: var(--risk-low-bg);
+  color: var(--risk-low);
+}
+
+.cm-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.cm-summary strong {
+  color: var(--text-primary);
+}
+
+.precision-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.precision-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 60px;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: var(--text-sm);
+}
+
+.precision-label {
+  color: var(--text-secondary);
+}
+
+.precision-track {
+  height: 12px;
+  border-radius: 6px;
+  background-color: var(--border-subtle);
+  overflow: hidden;
+}
+
+.precision-fill {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background-color: var(--brand-primary);
+}
+
+.precision-value {
+  color: var(--text-primary);
+  font-weight: var(--font-semibold);
+  text-align: right;
+}
+
+.model-comparison-table {
+  margin-top: var(--space-5);
+}
+
+.chart-link {
+  font-size: var(--text-sm);
+  color: var(--color-info);
+  text-decoration: none;
+}
+
+.chart-link:hover {
+  text-decoration: underline;
+}

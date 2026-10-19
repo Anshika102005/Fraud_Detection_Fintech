@@ -1,0 +1,35 @@
+groups:
+  - name: fraud-api-slo
+    rules:
+      - alert: FraudApiDown
+        expr: up{job="fraud-api"} == 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: "Fraud API is not scrapeable for 2m"
+
+      - alert: FraudApiHighP99Latency
+        expr: histogram_quantile(0.99, sum(rate(predict_latency_seconds_bucket[5m])) by (le)) > 0.5
+        for: 10m
+        labels: {severity: warning}
+        annotations:
+          summary: "p99 scoring latency above 500ms for 10m (real-time budget breach)"
+
+      - alert: DeclineRateSpike
+        expr: >
+          sum(rate(predict_requests_total{decision="BLOCK"}[15m]))
+          / clamp_min(sum(rate(predict_requests_total[15m])), 1e-6) > 0.20
+        for: 15m
+        labels: {severity: critical}
+        annotations:
+          summary: "BLOCK decision rate >20% — possible model/drift incident or false-positive explosion"
+
+      - alert: ScoreDistributionShift
+        expr: >
+          abs(sum(rate(predict_score_distribution_sum[30m]))
+              / clamp_min(sum(rate(predict_score_distribution_count[30m])), 1e-6)
+              - 0.05) > 0.10
+        for: 30m
+        labels: {severity: warning}
+        annotations:
+          summary: "Mean fraud score shifted far from baseline — check PSI drift report"

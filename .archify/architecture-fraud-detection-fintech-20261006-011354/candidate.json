@@ -1,0 +1,508 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Fraud Detection Fintech — System Architecture",
+    "locale": "en",
+    "output": ".archify/architecture-fraud-detection-fintech-20261006-011354/fraud-detection-fintech.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "scoring",
+        "label": "Real-time scoring",
+        "focus": [
+          "bank",
+          "api",
+          "engine",
+          "feats",
+          "model",
+          "verdict",
+          "kv"
+        ],
+        "note": "Hot path: online features → model → threshold → risk policy → decision"
+      },
+      {
+        "id": "training",
+        "label": "Training & MLOps",
+        "focus": [
+          "synth",
+          "builder",
+          "train",
+          "bundle",
+          "mlflow",
+          "promote"
+        ],
+        "note": "Leakage-safe walk-forward training and gated registry promotion"
+      },
+      {
+        "id": "prototype",
+        "label": "Prototype app",
+        "focus": [
+          "spa",
+          "fgapi",
+          "lsmock"
+        ],
+        "note": "Demo React UI with credential login and mock fallback"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "synth",
+      "type": "database",
+      "label": "Synthetic Generator",
+      "sublabel": "2000 cards · 90 days",
+      "pos": [
+        40,
+        80
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "builder",
+      "type": "backend",
+      "label": "Feature Builder",
+      "sublabel": "point-in-time matrix",
+      "pos": [
+        290,
+        80
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "train",
+      "type": "backend",
+      "label": "Trainer",
+      "sublabel": "walk-forward + embargo",
+      "pos": [
+        540,
+        80
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "bundle",
+      "type": "database",
+      "label": "model_bundle.joblib",
+      "sublabel": "serving contract",
+      "pos": [
+        540,
+        270
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "promote",
+      "type": "backend",
+      "label": "Promotion Gates",
+      "sublabel": "PR-AUC · FNR · P@90",
+      "pos": [
+        40,
+        270
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "mlflow",
+      "type": "cloud",
+      "label": "MLflow Registry",
+      "sublabel": "staging / production",
+      "pos": [
+        290,
+        270
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "bank",
+      "type": "external",
+      "label": "Card Transactions",
+      "sublabel": "issuer events",
+      "pos": [
+        40,
+        520
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "Fraud Detection API",
+      "sublabel": "FastAPI :8000",
+      "tag": "API key + limiter",
+      "pos": [
+        290,
+        520
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "engine",
+      "type": "backend",
+      "label": "ScoringEngine",
+      "sublabel": "bundle → decision",
+      "pos": [
+        540,
+        520
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "feats",
+      "type": "backend",
+      "label": "Online Features",
+      "sublabel": "serving-consistent",
+      "pos": [
+        780,
+        520
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "model",
+      "type": "backend",
+      "label": "Model Bundle",
+      "sublabel": "proba → policy",
+      "pos": [
+        1000,
+        520
+      ],
+      "size": [
+        120,
+        64
+      ]
+    },
+    {
+      "id": "metrics",
+      "type": "database",
+      "label": "Prometheus",
+      "sublabel": "observe_prediction",
+      "pos": [
+        540,
+        720
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "kv",
+      "type": "database",
+      "label": "KV State Store",
+      "sublabel": "velocity · idempotency",
+      "pos": [
+        290,
+        720
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "plog",
+      "type": "database",
+      "label": "Prediction Logs",
+      "sublabel": "Postgres · JSONL fallback",
+      "pos": [
+        790,
+        720
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "verdict",
+      "type": "external",
+      "label": "Decision",
+      "sublabel": "risk · factors",
+      "pos": [
+        1000,
+        720
+      ],
+      "size": [
+        130,
+        64
+      ]
+    },
+    {
+      "id": "drift",
+      "type": "database",
+      "label": "Drift Monitor",
+      "sublabel": "PSI on served features",
+      "pos": [
+        790,
+        900
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "FraudGuard AI SPA",
+      "sublabel": "React 18 · Vite · demo auth",
+      "pos": [
+        40,
+        1100
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "fgapi",
+      "type": "backend",
+      "label": "Prototype FastAPI",
+      "sublabel": "auth · txns · alerts",
+      "pos": [
+        340,
+        1100
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "lsmock",
+      "type": "database",
+      "label": "Browser localStorage",
+      "sublabel": "session v2 · txns v2",
+      "pos": [
+        40,
+        1260
+      ],
+      "size": [
+        190,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Offline training & MLOps",
+      "wraps": [
+        "synth",
+        "builder",
+        "train",
+        "bundle",
+        "mlflow",
+        "promote"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Real-time scoring service",
+      "wraps": [
+        "api",
+        "engine",
+        "feats",
+        "model",
+        "kv",
+        "plog",
+        "metrics",
+        "drift",
+        "verdict"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "FraudGuard AI prototype",
+      "wraps": [
+        "spa",
+        "fgapi",
+        "lsmock"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "synth-to-builder",
+      "from": "synth",
+      "to": "builder",
+      "label": "generate"
+    },
+    {
+      "id": "builder-to-train",
+      "from": "builder",
+      "to": "train",
+      "label": "PIT"
+    },
+    {
+      "id": "train-to-bundle",
+      "from": "train",
+      "to": "bundle",
+      "label": "fit"
+    },
+    {
+      "id": "bundle-to-mlflow",
+      "from": "bundle",
+      "to": "mlflow",
+      "label": "register"
+    },
+    {
+      "id": "mlflow-to-promote",
+      "from": "mlflow",
+      "to": "promote",
+      "label": "gates"
+    },
+    {
+      "id": "bundle-to-api",
+      "from": "bundle",
+      "to": "api",
+      "label": "joblib.load",
+      "variant": "emphasis"
+    },
+    {
+      "id": "mlflow-to-api",
+      "from": "mlflow",
+      "to": "api",
+      "label": "fallback",
+      "variant": "dashed"
+    },
+    {
+      "id": "bank-to-api",
+      "from": "bank",
+      "to": "api",
+      "label": "/predict",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-to-engine",
+      "from": "api",
+      "to": "engine",
+      "label": "score"
+    },
+    {
+      "id": "engine-to-feats",
+      "from": "engine",
+      "to": "feats",
+      "label": "features"
+    },
+    {
+      "id": "feats-to-model",
+      "from": "feats",
+      "to": "model",
+      "label": "vector"
+    },
+    {
+      "id": "model-to-verdict",
+      "from": "model",
+      "to": "verdict",
+      "label": "decision"
+    },
+    {
+      "id": "engine-to-kv",
+      "from": "engine",
+      "to": "kv",
+      "label": "hot state"
+    },
+    {
+      "id": "engine-to-plog",
+      "from": "engine",
+      "to": "plog",
+      "label": "prediction log"
+    },
+    {
+      "id": "engine-to-metrics",
+      "from": "engine",
+      "to": "metrics",
+      "label": "metrics"
+    },
+    {
+      "id": "plog-to-drift",
+      "from": "plog",
+      "to": "drift",
+      "label": "recent()"
+    },
+    {
+      "id": "spa-to-fgapi",
+      "from": "spa",
+      "to": "fgapi",
+      "label": "REST /api/v1",
+      "variant": "emphasis"
+    },
+    {
+      "id": "spa-to-lsmock",
+      "from": "spa",
+      "to": "lsmock",
+      "label": "session"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Serving hot path",
+      "items": [
+        "score(): features → model → threshold → risk policy → SHAP top-5 factors",
+        "Duplicate requests replay from the TTL idempotency cache",
+        "Predictions land in Postgres (JSONL fallback); /health and /ready report bundle load"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Training contract",
+      "items": [
+        "Walk-forward folds with label embargo block future and label leakage",
+        "model_bundle.joblib carries model + feature order + threshold + policy + priors",
+        "Promotion gates (PR-AUC, FNR, P@90% recall) exit 1 to block CI deploy"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "FraudGuard AI prototype",
+      "items": [
+        "React SPA targets the FastAPI blueprint at /api/v1 with Bearer auth",
+        "6s request timeout, then localStorage mock fallback keeps the demo alive",
+        "Demo credential login: Anshika (customer) · Vikram (analyst)"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Monitoring & retraining",
+      "items": [
+        "PSI drift computed on served prediction logs",
+        "Retrain triggers: PSI breach or label-backed metric degradation",
+        "Every retrain must re-pass the promotion gates before going live"
+      ]
+    }
+  ]
+}

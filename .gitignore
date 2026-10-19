@@ -1,0 +1,36 @@
+# --- environments / secrets ---
+.env
+
+# --- data ---
+data/raw/*
+data/processed/*
+data/sample/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/sample/.gitkeep
+data/predictions.jsonl*
+data/*.db
+data/*.db-*
+reports/
+
+# --- artifacts / models / experiments ---
+artifacts/
+models/
+mlruns/
+mlflow-artifacts/
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- legacy demo app (kept for reference) ---
+application_data.csv
+previous_application.csv
+
+# --- ide ---
+.qodo/

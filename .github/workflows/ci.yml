@@ -1,0 +1,96 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install ruff
+      - run: ruff check src mlops tests scripts
+
+  unit-and-leakage-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - run: python -m pytest tests/unit tests/leakage -q
+
+  model-validation-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - name: Train tiny model end-to-end
+        run: |
+          python -m src.data.generate_synthetic --cards 150 --days 30 --fraud-rate 0.03 --out data/sample/ci_transactions.csv
+          python -m src.models.train --model lightgbm --data data/sample/ci_transactions.csv --no-mlflow --trials 0
+      - name: Assert model meets promotion gates
+        run: python scripts/check_metrics.py --metrics artifacts/metrics.json
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: fraud
+          POSTGRES_PASSWORD: ci_password
+          POSTGRES_DB: fraud_db
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U fraud" --health-interval 5s
+          --health-timeout 5s --health-retries 12
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements.txt
+      - name: Apply DB migrations
+        run: |
+          python -m src.data.migrate --database-url postgresql://fraud:ci_password@localhost:5432/fraud_db
+          python - <<'SQL'
+          from src.data.db import apply_sql_file, get_engine
+          e = get_engine("postgresql://fraud:ci_password@localhost:5432/fraud_db")
+          apply_sql_file(e, "sql/indexes.sql")
+          SQL
+      - name: API integration (Redis + Postgres stores)
+        env:
+          FRAUD_REDIS_URL: redis://localhost:6379/0
+          DATABASE_URL: postgresql://fraud:ci_password@localhost:5432/fraud_db
+        run: python -m pytest tests/integration -q
+
+  docker:
+    needs: [lint, unit-and-leakage-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -f docker/Dockerfile.api -t fraud-api:${{ github.sha }} .
+      - run: docker build -f docker/Dockerfile.train -t fraud-train:${{ github.sha }} .
+
+  deploy:
+    needs: [model-validation-gate, integration-tests, docker]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy placeholder
+        run: |
+          echo "Deploy image fraud-api:${{ github.sha }}"
+          echo "Promotion gate already enforced: model-validation-gate + mlops/promote.py in the registry."
+          echo "In production: push image to registry -> helm upgrade -> alias flip via promote.py."

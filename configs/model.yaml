@@ -1,0 +1,92 @@
+# Training / feature-engineering configuration.
+# Every rolling & expanding feature is computed STRICTLY on past transactions
+# (t < current). See PROJECT_BLUEPRINT.md sections 3-14.
+
+data:
+  history_key: customer_id      # behavioral features are keyed per customer
+  label: is_fraud
+  label_ts_col: label_ts        # when the label actually became known (chargeback lag)
+
+# Velocity windows in minutes (counts per customer)
+velocity_windows_minutes: [5, 15, 30, 60, 360, 1440, 10080, 43200]
+# Trailing distinct-count windows (unique merchants/devices/...) in minutes
+distinct_windows_minutes: [1440, 10080]
+
+# Merchant/MCC historical fraud-rate smoothing (Laplace-style prior)
+merchant_smoothing:
+  prior_rate: 0.02              # global fraud-rate prior
+  strength: 100                 # pseudo-count of prior observations
+
+woe_smoothing: 50               # historical WOE pseudo-count
+
+imbalance:
+  strategy: scale_pos_weight
+  max_spw: 30.0                 # cap to avoid destroying probability calibration
+
+validation:
+  strategy: walk_forward        # NEVER random-split temporal fraud data
+  folds: 3
+  embargo_days: 14              # >= max chargeback delay: no label leakage across folds
+  final_holdout_fraction: 0.2
+
+optuna:
+  n_trials: 60
+  objective: pr_auc             # fraud-specific, NOT accuracy
+
+# Business cost model: TotalCost = FN*cost_fn + FP*cost_fp
+cost_model:
+  false_negative: 100.0         # missed fraud (chargeback + fees + brand damage)
+  false_positive: 5.0           # good customer blocked (inconvenience + churn risk)
+
+# Promotion gates (mlops/promote.py) — candidate must pass ALL to reach production
+gates:
+  pr_auc_min: 0.50
+  fnr_max: 0.20
+  precision_at_recall90_min: 0.25
+
+xgboost:
+  base:
+    n_estimators: 400
+    learning_rate: 0.05
+    max_depth: 6
+    min_child_weight: 5
+    subsample: 0.9
+    colsample_bytree: 0.8
+    reg_alpha: 0.1
+    reg_lambda: 1.0
+    tree_method: hist
+    eval_metric: aucpr
+    early_stopping_rounds: 50
+  space:
+    learning_rate: [0.01, 0.2]
+    max_depth: [3, 9]
+    min_child_weight: [1, 20]
+    subsample: [0.6, 1.0]
+    colsample_bytree: [0.5, 1.0]
+    reg_alpha: [1.0e-3, 10.0]
+    reg_lambda: [1.0e-3, 10.0]
+    n_estimators: [200, 800]
+
+lightgbm:
+  base:
+    n_estimators: 400
+    learning_rate: 0.05
+    num_leaves: 31
+    min_child_samples: 30
+    subsample: 0.9
+    colsample_bytree: 0.8
+    reg_alpha: 0.1
+    reg_lambda: 1.0
+  space:
+    learning_rate: [0.01, 0.2]
+    num_leaves: [15, 127]
+    min_child_samples: [10, 100]
+    subsample: [0.6, 1.0]
+    colsample_bytree: [0.5, 1.0]
+    reg_alpha: [1.0e-3, 10.0]
+    reg_lambda: [1.0e-3, 10.0]
+    n_estimators: [200, 800]
+
+explainability:
+  shap_sample: 2000
+  top_k_factors: 5

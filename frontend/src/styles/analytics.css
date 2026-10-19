@@ -1,0 +1,91 @@
+/* ============================================================
+   Analytics page styles
+   ============================================================ */
+
+.accuracy-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--bg-secondary);
+}
+
+.accuracy-value {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.accuracy-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.accuracy-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.accuracy-bar-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 60px;
+  gap: var(--space-2);
+  align-items: center;
+  font-size: var(--text-xs);
+}
+
+.accuracy-bar-row span:first-child {
+  color: var(--text-secondary);
+}
+
+.accuracy-bar-row span:last-child {
+  color: var(--text-primary);
+  font-weight: var(--font-semibold);
+  text-align: right;
+}
+
+.accuracy-bar-track {
+  height: 10px;
+  border-radius: 5px;
+  background-color: var(--border-subtle);
+  overflow: hidden;
+}
+
+.accuracy-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background-color: var(--brand-primary);
+}
+
+.segment-group {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.segment-btn {
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.segment-btn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.segment-btn.active {
+  background-color: var(--brand-primary);
+  color: #ffffff;
+}

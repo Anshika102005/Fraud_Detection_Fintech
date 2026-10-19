@@ -1,0 +1,181 @@
+/* ============================================================
+   Responsive Styles
+============================================================ */
+
+/* ---- Desktop (1280px+) ---- */
+@media (max-width: 1280px) {
+  .container {
+    padding: 0 var(--space-4);
+  }
+}
+
+/* ---- Laptop/Table (1024px - 1280px) ---- */
+@media (max-width: 1279px) {
+  .dashboard {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ---- Tablet (768px - 1024px) ---- */
+@media (max-width: 1024px) {
+  .dashboard {
+    padding: var(--space-4);
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar {
+    padding: 0 var(--space-3);
+  }
+
+  .navbar-center {
+    display: none;
+  }
+
+  /* Allow horizontal scroll on tables */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ---- Phablet (600px - 768px) ---- */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: var(--space-3);
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .kpi-card {
+    padding: var(--space-4);
+    text-align: center;
+  }
+
+  .kpi-card .kpi-icon {
+    margin: 0 auto var(--space-2);
+  }
+
+  .chart-wrapper {
+    height: 260px;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+
+  .modal {
+    margin: var(--space-2);
+    max-width: none;
+    max-height: 85vh;
+  }
+}
+
+/* ---- Mobile (480px - 600px) ---- */
+@media (max-width: 600px) {
+  .dashboard {
+    padding: var(--space-2);
+  }
+
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kpi-card .kpi-value {
+    font-size: var(--text-xl);
+  }
+
+  .navbar {
+    padding: 0 var(--space-2);
+  }
+
+  .navbar-title {
+    font-size: var(--text-lg);
+  }
+
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-bar .filter-group {
+    min-width: 100%;
+  }
+
+  .alert-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .alert-item-time {
+    align-self: flex-end;
+  }
+}
+
+/* ---- Very small screens ---- */
+@media (max-width: 400px) {
+  .kpi-card {
+    padding: var(--space-3);
+  }
+
+  .container {
+    padding: 0 var(--space-2);
+  }
+}
+
+/* ---- Hide scrollbar for mobile tables but keep scroll ---- */
+.table-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+/* ---- Risk meter responsive ---- */
+@media (max-width: 768px) {
+  .risk-meter {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .risk-distribution {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+}
+
+/* ---- Donut chart responsive ---- */
+@media (max-width: 480px) {
+  .donut-stats {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
+
+/* ---- Transaction table responsive ---- */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    padding: 8px 12px;
+    font-size: var(--text-xs);
+  }
+
+  .table tbody tr:hover {
+    background-color: var(--bg-hover);
+  }
+}
