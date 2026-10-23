@@ -11,10 +11,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.auth import TokenBucketLimiter
 from src.api.middleware import RequestContextMiddleware
+from src.api.records import RecordStore
 from src.api.routes.analyst import router as analyst_router
 from src.api.routes.auth import router as auth_router
 from src.api.routes.health import router as health_router
 from src.api.routes.predict import router as predict_router
+from src.api.routes.records import router as records_router
 from src.api.users import UserStore
 from src.config import Settings, get_settings
 from src.logging_conf import setup_logging
@@ -74,10 +76,14 @@ def load_engine(settings: Settings) -> ScoringEngine:
 async def lifespan(app):
     settings: Settings = app.state.settings
     # User accounts + sessions live in their own SQLite file so the auth plane
-    # works even when the model bundle is unavailable.
+    # works even when the model bundle is unavailable. Transactions, fraud
+    # alerts, and analyst cases share that database, scoped per account.
     store = UserStore(settings.auth_db_path)
     store.init_db()
     app.state.user_store = store
+    records = RecordStore(settings.auth_db_path)
+    records.init_db()
+    app.state.record_store = records
     global _engine
     try:
         _engine = load_engine(settings)
@@ -112,6 +118,7 @@ def create_app(settings: Settings | None = None) -> "FastAPI":
     app.include_router(health_router)
     app.include_router(predict_router)
     app.include_router(auth_router)
+    app.include_router(records_router)
     app.include_router(analyst_router)
     return app
 

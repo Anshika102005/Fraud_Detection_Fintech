@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 
 export default function Transactions() {
-  const { transactions, alerts, loading, error, isEmptyMode, restoreDemoData, refreshData } = useTransactions();
+  const { transactions, alerts, loading, error, isEmptyMode, refreshData } = useTransactions();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [riskFilter, setRiskFilter] = useState('ALL');
@@ -128,8 +128,8 @@ export default function Transactions() {
               <PlusCircle size={16} />
               <span>+ Add Transaction</span>
             </Link>
-            <button onClick={restoreDemoData} className="btn-landing-secondary">
-              Explore Demo Transactions
+            <button onClick={refreshData} className="btn-landing-secondary">
+              Reload Transactions
             </button>
           </div>
         </div>

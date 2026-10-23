@@ -33,15 +33,18 @@ import {
 export default function AnalystDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAnalystData = async () => {
       setLoading(true);
+      setError(null);
       try {
         const res = await analystApi.getAnalystDashboard();
         setData(res);
       } catch (err) {
         console.error('Failed to load analyst overview:', err);
+        setError(err.message || 'Failed to load fraud intelligence telemetry.');
       } finally {
         setLoading(false);
       }
@@ -49,51 +52,39 @@ export default function AnalystDashboard() {
     fetchAnalystData();
   }, []);
 
-  if (loading || !data) {
+  if (loading) {
     return <div className="page-container" style={{ padding: '24px', color: '#94a3b8' }}>Loading Fraud Intelligence Telemetry...</div>;
   }
 
-  const { macroKpis, fraudTrend, vectorBreakdown } = data;
+  if (error || !data) {
+    return (
+      <div className="page-container" style={{ padding: '24px' }}>
+        <div
+          role="alert"
+          style={{
+            padding: '14px 16px',
+            borderRadius: '10px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#fca5a5',
+            fontSize: '0.9rem',
+          }}
+        >
+          {error || 'No overview data available.'}
+        </div>
+      </div>
+    );
+  }
 
-  // Additional analyst charts data
-  const riskDistribution = [
-    { name: 'Low Risk (0-30)', value: 82, color: '#10b981' },
-    { name: 'Medium Risk (31-60)', value: 13, color: '#f59e0b' },
-    { name: 'High Risk (61-80)', value: 3.5, color: '#ef4444' },
-    { name: 'Critical Risk (81-100)', value: 1.5, color: '#dc2626' },
-  ];
-
-  const paymentMethodDistribution = [
-    { method: 'UPI (P2P / Collect)', fraudCount: 2250, safeCount: 840000, rate: '0.27%' },
-    { method: 'QR Scan Payment', fraudCount: 1174, safeCount: 320000, rate: '0.36%' },
-    { method: 'Cards (Debit / Credit)', fraudCount: 686, safeCount: 180000, rate: '0.38%' },
-    { method: 'Net Banking & IMPS', fraudCount: 450, safeCount: 52000, rate: '0.86%' },
-    { method: 'Wallets & PPI', fraudCount: 332, safeCount: 28000, rate: '1.18%' },
-  ];
-
-  const locationDistribution = [
-    { state: 'Maharashtra', incidents: 1240, percentage: 25.3, riskLevel: 'HIGH' },
-    { state: 'Karnataka', incidents: 980, percentage: 20.0, riskLevel: 'MEDIUM' },
-    { state: 'Delhi NCR', incidents: 890, percentage: 18.2, riskLevel: 'HIGH' },
-    { state: 'Rajasthan', incidents: 740, percentage: 15.1, riskLevel: 'CRITICAL' },
-    { state: 'Tamil Nadu', incidents: 560, percentage: 11.4, riskLevel: 'LOW' },
-    { state: 'Others', incidents: 482, percentage: 10.0, riskLevel: 'MEDIUM' },
-  ];
-
-  const hourlyFraudActivity = [
-    { hour: '00:00', cases: 140 },
-    { hour: '02:00', cases: 280 }, // peak late-night fraud
-    { hour: '04:00', cases: 190 },
-    { hour: '06:00', cases: 45 },
-    { hour: '08:00', cases: 60 },
-    { hour: '10:00', cases: 110 },
-    { hour: '12:00', cases: 135 },
-    { hour: '14:00', cases: 150 },
-    { hour: '16:00', cases: 180 },
-    { hour: '18:00', cases: 210 },
-    { hour: '20:00', cases: 260 },
-    { hour: '22:00', cases: 310 },
-  ];
+  const {
+    macroKpis,
+    fraudTrend,
+    vectorBreakdown,
+    riskDistribution,
+    paymentMethodDistribution,
+    locationDistribution,
+    hourlyActivity,
+  } = data;
 
   return (
     <div className="page-container" style={{ padding: '24px', color: '#f8fafc' }}>
@@ -126,7 +117,9 @@ export default function AnalystDashboard() {
           <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#ffffff', fontFamily: 'Plus Jakarta Sans' }}>
             {macroKpis.totalTransactions.toLocaleString('en-IN')}
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>Across 124,000 active accounts</div>
+          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>
+            Across {(macroKpis.activeAccounts || 0).toLocaleString('en-IN')} registered accounts
+          </div>
         </div>
 
         {/* 2. Fraud Detected */}
@@ -168,7 +161,7 @@ export default function AnalystDashboard() {
           <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#10b981', fontFamily: 'Plus Jakarta Sans' }}>
             {macroKpis.fraudRate}
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>Well within RBI regulatory cap</div>
+          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>Flagged share of recorded transactions</div>
         </div>
 
         {/* 5. Processed Transaction Value */}
@@ -180,9 +173,9 @@ export default function AnalystDashboard() {
             </div>
           </div>
           <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#ffffff', fontFamily: 'Plus Jakarta Sans' }}>
-            ₹48.2 Cr
+            ₹{Number(macroKpis.totalTransactionValue || 0).toLocaleString('en-IN')}
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>Cumulative 30-day network flow</div>
+          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>Cumulative recorded network flow</div>
         </div>
 
         {/* 6. Average Network Risk */}
@@ -196,7 +189,7 @@ export default function AnalystDashboard() {
           <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#38bdf8', fontFamily: 'Plus Jakarta Sans' }}>
             {macroKpis.averageRiskScore} <span style={{ fontSize: '1rem', color: '#94a3b8', fontWeight: '500' }}>/ 100</span>
           </div>
-          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>Low aggregate network exposure</div>
+          <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '4px' }}>Average score across recorded transactions</div>
         </div>
       </div>
 
@@ -249,6 +242,11 @@ export default function AnalystDashboard() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {vectorBreakdown.length === 0 && (
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+                No flagged threat vectors recorded yet.
+              </p>
+            )}
             {vectorBreakdown.map((vec) => (
               <div key={vec.name}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem', color: '#cbd5e1', marginBottom: '4px' }}>
@@ -272,10 +270,17 @@ export default function AnalystDashboard() {
             <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#ffffff', fontWeight: '700' }}>
               Network Risk Distribution
             </h3>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>1.42M Transactions</span>
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+              {macroKpis.totalTransactions.toLocaleString('en-IN')} Transactions
+            </span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {riskDistribution.every((item) => item.value === 0) && (
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+                No transactions recorded yet.
+              </p>
+            )}
             {riskDistribution.map((item) => (
               <div key={item.name}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.825rem', color: '#cbd5e1', marginBottom: '4px' }}>
@@ -307,7 +312,7 @@ export default function AnalystDashboard() {
 
           <div style={{ width: '100%', height: 200 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={hourlyFraudActivity} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+              <BarChart data={hourlyActivity} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                 <XAxis dataKey="hour" stroke="#64748b" fontSize={10} />
                 <YAxis stroke="#64748b" fontSize={10} />
                 <Tooltip contentStyle={{ background: '#0f172a', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff' }} />
@@ -324,12 +329,17 @@ export default function AnalystDashboard() {
         <div style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '22px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#ffffff', fontWeight: '700' }}>
-              Geographic Fraud Hotspots (India)
+              Geographic Fraud Hotspots
             </h3>
             <MapPin size={18} style={{ color: '#ef4444' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {locationDistribution.length === 0 && (
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+                No flagged incidents recorded yet.
+              </p>
+            )}
             {locationDistribution.map((loc) => (
               <div key={loc.state} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
                 <div>
@@ -366,6 +376,11 @@ export default function AnalystDashboard() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {paymentMethodDistribution.length === 0 && (
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+                No transactions recorded yet.
+              </p>
+            )}
             {paymentMethodDistribution.map((pm) => (
               <div key={pm.method} style={{ padding: '10px 12px', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>

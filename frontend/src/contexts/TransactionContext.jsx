@@ -98,13 +98,6 @@ export const TransactionProvider = ({ children }) => {
     transactionsApi.setEmptyStateMode(nextState);
   };
 
-  const restoreDemoData = () => {
-    transactionsApi.resetDemoDataset();
-    fraudAlertsApi.resetAlerts();
-    setIsEmptyMode(false);
-    loadData();
-  };
-
   const updateAlertStatus = async (alertId, status) => {
     await fraudAlertsApi.updateAlertStatus(alertId, status);
     setAlerts((prev) => prev.map((a) => (a.id === alertId ? { ...a, status } : a)));
@@ -118,7 +111,6 @@ export const TransactionProvider = ({ children }) => {
     error,
     isEmptyMode,
     toggleEmptyMode,
-    restoreDemoData,
     addTransaction,
     processCsv,
     updateAlertStatus,

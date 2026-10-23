@@ -1,8 +1,10 @@
 """User account + session store (SQLite) with PBKDF2 password hashing.
 
-Demo accounts (customer Anshika, analyst Vikram) are seeded on first startup
-for LOCAL DEVELOPMENT ONLY. Passwords are stored only as PBKDF2-SHA256 hashes;
-they are never logged, returned, or exposed to the frontend.
+No default accounts exist: the database starts EMPTY and every account is
+created explicitly — customers through ``POST /api/v1/auth/register``, analyst
+accounts through the ``scripts/create_analyst.py`` provisioning script. Passwords
+are stored only as PBKDF2-SHA256 hashes; they are never logged, returned, or
+exposed to the frontend.
 """
 from __future__ import annotations
 
@@ -15,38 +17,6 @@ from pathlib import Path
 from typing import Any
 
 PBKDF2_ITERATIONS = 390_000
-
-# Demo profiles keep the exact identities the frontend already ships with so
-# the existing demo experience is preserved — but credentials now live (hashed)
-# in the backend database instead of the JS bundle.
-DEMO_USERS: list[dict[str, Any]] = [
-    {
-        "id": "USR-8801",
-        "username": "anshika",
-        "email": "anshika.sharma@example.com",
-        "password": "Anshika@123",
-        "name": "Anshika Sharma",
-        "role": "customer",
-        "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-        "title": "Customer (Personal Protection)",
-        "city": "Bengaluru, India",
-        "created_at": "2025-11-14",
-        "phone_masked": "+91 98\u2022\u2022\u2022\u2022 1204",
-    },
-    {
-        "id": "USR-8890",
-        "username": "vikram",
-        "email": "vikram@fraudguard.ai",
-        "password": "Vikram@123",
-        "name": "Vikram",
-        "role": "analyst",
-        "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-        "title": "Analyst (Fraud Intelligence)",
-        "city": "Mumbai, India",
-        "created_at": "2024-03-10",
-        "phone_masked": "+91 97\u2022\u2022\u2022\u2022 4419",
-    },
-]
 
 
 def hash_password(password: str, *, iterations: int = PBKDF2_ITERATIONS) -> str:
@@ -124,31 +94,8 @@ class UserStore:
                 );
                 """
             )
-        self._seed_demo_users()
+        # No seeding: the user table starts empty by design.
         self.purge_expired_sessions()
-
-    def _seed_demo_users(self) -> None:
-        with self._connect() as conn:
-            for demo in DEMO_USERS:
-                existing = conn.execute(
-                    "SELECT id FROM users WHERE email = ? OR username = ?",
-                    (demo["email"], demo["username"]),
-                ).fetchone()
-                if existing:
-                    continue
-                conn.execute(
-                    """
-                    INSERT INTO users (id, username, email, password_hash, role, name,
-                                       avatar, title, city, phone_masked, created_at, last_login)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
-                    """,
-                    (
-                        demo["id"], demo["username"], demo["email"],
-                        hash_password(demo["password"]), demo["role"], demo["name"],
-                        demo["avatar"], demo["title"], demo["city"],
-                        demo["phone_masked"], demo["created_at"],
-                    ),
-                )
 
     # --- users -------------------------------------------------------------
 
@@ -175,6 +122,8 @@ class UserStore:
         """Create a user. Returns the public user, or None when email/username taken."""
         if self.find_user_by_identifier(email) or self.find_user_by_identifier(username):
             return None
+        if role not in ("customer", "analyst"):
+            raise ValueError(f"unsupported role: {role}")
         now = datetime.now(timezone.utc)
         with self._connect() as conn:
             conn.execute(

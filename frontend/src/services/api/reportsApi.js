@@ -1,56 +1,22 @@
 /* ============================================================
    FraudGuard AI — Reports API Service
-   Generates comprehensive Monthly Security Statements
+   The Monthly Security Statement is computed by the backend
+   from the signed-in account's own transactions. The client
+   only renders it and builds the downloadable text file from
+   the fetched report.
 ============================================================ */
 
 import { apiClient } from './client';
-import { getStoredUserSync } from './authApi';
 
 export const reportsApi = {
-  async getMonthlySecurityReport(month = 'August 2026') {
-    try {
-      return await apiClient.get('/reports/monthly', { month });
-    } catch {
-      return {
-        reportId: 'FG-RPT-2026-08',
-        month: month,
-        generatedAt: '2026-09-01 00:00 IST',
-        user: getStoredUserSync()?.name || 'Account Holder',
-        personalSafetyScore: 87,
-        safetyRating: 'Good',
-        metrics: {
-          totalTransactions: 124,
-          totalTransactionValue: 84250,
-          fraudTransactions: 2,
-          suspiciousTransactions: 4,
-          fraudRate: '1.61%',
-          averageRiskScore: 24,
-          highestRiskTransaction: {
-            id: 'TXN-90241',
-            merchant: 'Unknown P2P UPI Collect',
-            amount: 14500,
-            riskScore: 94,
-            riskLevel: 'CRITICAL',
-          },
-          mostUsedPaymentMethod: 'UPI - Google Pay (44%)',
-          mostUsedCategory: 'Food & Dining (38%)',
-          spendingChange: '+18% compared to July 2026',
-        },
-        highlights: [
-          'Successfully deflected 2 unsolicited UPI collect attempts totaling ₹19,499.',
-          'Your overall Personal Safety Score improved by +4 points from last month.',
-          'Zero account compromise or OTP leak incidents recorded.',
-          'Primary spending period concentrated between 6:00 PM and 10:00 PM.',
-        ],
-        aiAdvisorNotes:
-          'Maintain vigilance regarding urgent SMS notices mimicking utility or electricity providers. Never authorize unexpected collect requests on UPI applications.',
-      };
-    }
+  async getMonthlySecurityReport(month) {
+    const params = month ? { month } : {};
+    return apiClient.get('/reports/monthly', params);
   },
 
   async downloadReport(reportId) {
-    // Generate text blob download
     const report = await this.getMonthlySecurityReport();
+    const highest = report.metrics.highestRiskTransaction;
     const content = `======================================================
 FRAUDGUARD AI — MONTHLY SECURITY STATEMENT
 Tagline: Your Personal AI-Powered Fraud Protection
@@ -75,7 +41,11 @@ KEY METRICS & BEHAVIOR
 Most Used Payment Method: ${report.metrics.mostUsedPaymentMethod}
 Most Used Category: ${report.metrics.mostUsedCategory}
 Spending Trajectory: ${report.metrics.spendingChange}
-Highest Risk Alert: ${report.metrics.highestRiskTransaction.merchant} (INR ${report.metrics.highestRiskTransaction.amount.toLocaleString('en-IN')}) - Score ${report.metrics.highestRiskTransaction.riskScore}/100
+Highest Risk Alert: ${
+  highest
+    ? `${highest.merchant} (INR ${highest.amount.toLocaleString('en-IN')}) - Score ${highest.riskScore}/100`
+    : 'No flagged transactions recorded'
+}
 
 SECURITY HIGHLIGHTS
 ------------------------------------------------------
@@ -94,7 +64,7 @@ Support: safety@fraudguard.ai | Helpline: 1930
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `FraudGuard_Security_Report_${report.reportId}.txt`;
+    link.download = `FraudGuard_Security_Report_${reportId || report.reportId}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

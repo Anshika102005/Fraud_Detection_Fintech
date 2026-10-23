@@ -5,8 +5,8 @@
    passwords — a session only exists after the backend issues one.
 
    Strictly TWO roles:
-   1. Customer (Anshika) — Personal Fraud Protection
-   2. Analyst (Vikram) — Fraud Intelligence & Investigation
+   1. Customer — Personal Fraud Protection
+   2. Analyst — Fraud Intelligence & Investigation
    No Admin role exists anywhere.
 ============================================================ */
 
@@ -15,7 +15,7 @@ import { apiClient } from './client';
 const SESSION_KEY = 'fraudguard_session_v2';
 const TOKEN_KEY = 'fraudguard_token';
 
-/* Sessions written by pre-fix builds (which auto-authenticated as Anshika)
+/* Sessions written by pre-fix builds (which auto-authenticated a demo user)
    under assorted legacy keys. Purged on load so no stale identity can ever
    survive into the fixed app. */
 const LEGACY_SESSION_KEYS = [

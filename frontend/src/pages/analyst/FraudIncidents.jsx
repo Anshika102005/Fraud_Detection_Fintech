@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { analystApi } from '../../services/api/analystApi';
 import {
   AlertTriangle,
   ShieldAlert,
@@ -11,73 +12,34 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
-const INITIAL_INCIDENTS = [
-  {
-    incidentId: 'INC-9042',
-    transactionId: 'TXN-7402',
-    user: 'Anshika',
-    amount: '₹14,500',
-    risk: 'CRITICAL',
-    riskScore: 94,
-    fraudProbability: '94.2%',
-    reason: 'Unsolicited late-night collect request from unverified VPA in Jaipur',
-    status: 'New',
-    createdAt: 'Today, 02:41 AM',
-  },
-  {
-    incidentId: 'INC-9038',
-    transactionId: 'TXN-7389',
-    user: 'Rohan Verma',
-    amount: '₹28,000',
-    risk: 'HIGH',
-    riskScore: 78,
-    fraudProbability: '79.1%',
-    reason: 'Unusual velocity spike: 4 consecutive transfers within 90 seconds',
-    status: 'Under Review',
-    createdAt: 'Yesterday, 11:20 PM',
-  },
-  {
-    incidentId: 'INC-9025',
-    transactionId: 'TXN-7250',
-    user: 'Kavita Iyer',
-    amount: '₹4,999',
-    risk: 'HIGH',
-    riskScore: 72,
-    fraudProbability: '71.5%',
-    reason: 'Static QR code payment redirected to overseas payment gateway',
-    status: 'Confirmed Fraud',
-    createdAt: 'Sep 11, 04:15 PM',
-  },
-  {
-    incidentId: 'INC-9019',
-    transactionId: 'TXN-7198',
-    user: 'Arjun Mehta',
-    amount: '₹1,200',
-    risk: 'MEDIUM',
-    riskScore: 48,
-    fraudProbability: '46.0%',
-    reason: 'New merchant classification mismatch (Utility vs Dining)',
-    status: 'False Positive',
-    createdAt: 'Sep 10, 01:10 PM',
-  },
-  {
-    incidentId: 'INC-8994',
-    transactionId: 'TXN-7088',
-    user: 'Sneha Nair',
-    amount: '₹8,500',
-    risk: 'HIGH',
-    riskScore: 76,
-    fraudProbability: '75.8%',
-    reason: 'Remote access tool signature detected during active payment session',
-    status: 'Resolved',
-    createdAt: 'Sep 09, 08:34 PM',
-  },
-];
-
 export default function FraudIncidents() {
-  const [incidents, setIncidents] = useState(INITIAL_INCIDENTS);
+  const [incidents, setIncidents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [mineOnly, setMineOnly] = useState(false);
   const [selectedIncident, setSelectedIncident] = useState(null);
+
+  /* Cases are raised by the backend from customer fraud alerts and fetched
+     with the analyst session — nothing is hardcoded or generated client-side. */
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await analystApi.getCases(mineOnly ? { assignedTo: 'me' } : {});
+        if (active) setIncidents(res.cases || []);
+      } catch (err) {
+        if (active) setError(err.message || 'Failed to load fraud incidents.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [mineOnly]);
 
   const statuses = ['ALL', 'New', 'Under Review', 'Confirmed Fraud', 'False Positive', 'Resolved'];
 
@@ -86,12 +48,33 @@ export default function FraudIncidents() {
     return inc.status === statusFilter;
   });
 
-  const handleUpdateStatus = (incidentId, newStatus) => {
-    setIncidents((prev) =>
-      prev.map((inc) => (inc.incidentId === incidentId ? { ...inc, status: newStatus } : inc))
-    );
-    if (selectedIncident && selectedIncident.incidentId === incidentId) {
-      setSelectedIncident((prev) => ({ ...prev, status: newStatus }));
+  const handleUpdateStatus = async (incidentId, newStatus) => {
+    try {
+      const res = await analystApi.updateCase(incidentId, { status: newStatus });
+      const updated = res.case;
+      setIncidents((prev) =>
+        prev.map((inc) => (inc.incidentId === incidentId ? updated : inc))
+      );
+      if (selectedIncident && selectedIncident.incidentId === incidentId) {
+        setSelectedIncident(updated);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to update the incident status.');
+    }
+  };
+
+  const handleClaim = async (incidentId) => {
+    try {
+      const res = await analystApi.updateCase(incidentId, { assign: true });
+      const updated = res.case;
+      setIncidents((prev) =>
+        prev.map((inc) => (inc.incidentId === incidentId ? updated : inc))
+      );
+      if (selectedIncident && selectedIncident.incidentId === incidentId) {
+        setSelectedIncident(updated);
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to claim the case.');
     }
   };
 
@@ -151,7 +134,45 @@ export default function FraudIncidents() {
             {st}
           </button>
         ))}
+        <button
+          onClick={() => setMineOnly((v) => !v)}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '8px',
+            border: mineOnly ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.08)',
+            background: mineOnly ? 'rgba(16, 185, 129, 0.15)' : 'rgba(255,255,255,0.02)',
+            color: mineOnly ? '#ffffff' : '#94a3b8',
+            fontSize: '0.825rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
+        >
+          My Assigned Cases
+        </button>
       </div>
+
+      {loading && (
+        <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '16px' }}>
+          Loading fraud incidents from the case database...
+        </p>
+      )}
+
+      {error && (
+        <div
+          role="alert"
+          style={{
+            padding: '12px 14px',
+            marginBottom: '16px',
+            borderRadius: '10px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#fca5a5',
+            fontSize: '0.85rem',
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       {/* Incidents Table */}
       <div style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', overflow: 'hidden' }}>
@@ -171,6 +192,18 @@ export default function FraudIncidents() {
               </tr>
             </thead>
             <tbody>
+              {!loading && filteredIncidents.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={9}
+                    style={{ padding: '28px 16px', textAlign: 'center', color: '#64748b' }}
+                  >
+                    {mineOnly
+                      ? 'No cases are assigned to you yet. Open a case and claim it to see it here.'
+                      : 'No fraud incidents recorded yet. Cases appear here when the backend flags a customer transaction.'}
+                  </td>
+                </tr>
+              )}
               {filteredIncidents.map((inc) => (
                 <tr
                   key={inc.incidentId}
@@ -235,8 +268,28 @@ export default function FraudIncidents() {
               <div style={{ marginBottom: '6px' }}><span style={{ color: '#64748b' }}>Affected User:</span> <strong>{selectedIncident.user}</strong></div>
               <div style={{ marginBottom: '6px' }}><span style={{ color: '#64748b' }}>Transaction:</span> <strong>{selectedIncident.transactionId} ({selectedIncident.amount})</strong></div>
               <div style={{ marginBottom: '6px' }}><span style={{ color: '#64748b' }}>Fraud Probability:</span> <strong style={{ color: '#ef4444' }}>{selectedIncident.fraudProbability}</strong></div>
+              <div style={{ marginBottom: '6px' }}><span style={{ color: '#64748b' }}>Assigned To:</span> <strong>{selectedIncident.assignedToName || 'Unassigned'}</strong></div>
               <div><span style={{ color: '#64748b' }}>Flag Reason:</span> {selectedIncident.reason}</div>
             </div>
+
+            {!selectedIncident.assignedTo && (
+              <button
+                onClick={() => handleClaim(selectedIncident.incidentId)}
+                style={{
+                  width: '100%',
+                  padding: '9px',
+                  borderRadius: '8px',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  color: '#10b981',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  marginBottom: '16px',
+                }}
+              >
+                Claim Case for My Investigation
+              </button>
+            )}
 
             <div style={{ marginBottom: '20px' }}>
               <div style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '600', marginBottom: '8px' }}>

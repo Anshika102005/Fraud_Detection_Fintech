@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { DEMO_TRANSACTIONS, DEMO_USERS_LIST, PAYMENT_METHODS } from '../../data/indianData';
+import React, { useState, useMemo, useEffect } from 'react';
+import { analystApi } from '../../services/api/analystApi';
 import {
   Search,
   Filter,
@@ -20,14 +20,29 @@ export default function AnalystTransactions() {
   const [locationFilter, setLocationFilter] = useState('ALL');
   const [selectedTxn, setSelectedTxn] = useState(null);
 
-  // Generate enriched network transactions associated with users
-  const networkTransactions = useMemo(() => {
-    const userNames = ['Anshika', 'Rohan Verma', 'Kavita Iyer', 'Arjun Mehta', 'Sneha Nair', 'Aditya Rao'];
-    return DEMO_TRANSACTIONS.map((txn, idx) => ({
-      ...txn,
-      user: userNames[idx % userNames.length],
-      status: txn.isFraud ? 'fraudulent' : txn.riskLevel === 'CRITICAL' ? 'blocked' : txn.riskLevel === 'HIGH' ? 'suspicious' : 'legitimate',
-    }));
+  // All accounts' transactions, fetched from the backend with the analyst
+  // session. Owner names come from the users table — nothing is hardcoded.
+  const [networkTransactions, setNetworkTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await analystApi.getTransactions({ limit: 1000 });
+        if (active) setNetworkTransactions(res.transactions || []);
+      } catch (err) {
+        if (active) setError(err.message || 'Failed to load network transactions.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const filtered = useMemo(() => {
@@ -91,6 +106,29 @@ export default function AnalystTransactions() {
           Showing <strong>{filtered.length}</strong> of {networkTransactions.length} ingested records
         </div>
       </div>
+
+      {loading && (
+        <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '16px' }}>
+          Loading network transactions from the database...
+        </p>
+      )}
+
+      {error && (
+        <div
+          role="alert"
+          style={{
+            padding: '12px 14px',
+            marginBottom: '16px',
+            borderRadius: '10px',
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            color: '#fca5a5',
+            fontSize: '0.85rem',
+          }}
+        >
+          {error}
+        </div>
+      )}
 
       {/* Filter Bar */}
       <div style={{ background: '#111827', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '16px', marginBottom: '24px', display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
@@ -175,6 +213,17 @@ export default function AnalystTransactions() {
               </tr>
             </thead>
             <tbody>
+              {!loading && filtered.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={11}
+                    style={{ padding: '28px 16px', textAlign: 'center', color: '#64748b' }}
+                  >
+                    No transactions match the current filters. Records appear here
+                    after customers add or upload transactions.
+                  </td>
+                </tr>
+              )}
               {filtered.map((t) => (
                 <tr
                   key={t.id}
@@ -246,7 +295,7 @@ export default function AnalystTransactions() {
               <div><span style={{ color: '#64748b' }}>Category:</span> <div style={{ color: '#ffffff' }}>{selectedTxn.category}</div></div>
               <div><span style={{ color: '#64748b' }}>Method:</span> <div style={{ color: '#ffffff' }}>{selectedTxn.paymentMethod}</div></div>
               <div><span style={{ color: '#64748b' }}>Location:</span> <div style={{ color: '#ffffff' }}>{selectedTxn.location}</div></div>
-              <div><span style={{ color: '#64748b' }}>Device:</span> <div style={{ color: '#ffffff' }}>{selectedTxn.deviceType}</div></div>
+              <div><span style={{ color: '#64748b' }}>Device:</span> <div style={{ color: '#ffffff' }}>{selectedTxn.device}</div></div>
               <div><span style={{ color: '#64748b' }}>Timestamp:</span> <div style={{ color: '#ffffff' }}>{selectedTxn.date} {selectedTxn.time}</div></div>
             </div>
 
@@ -255,7 +304,8 @@ export default function AnalystTransactions() {
                 Risk Analysis Breakdown ({selectedTxn.riskLevel} - Score: {selectedTxn.riskScore}/100)
               </div>
               <div style={{ fontSize: '0.825rem', color: '#cbd5e1' }}>
-                {selectedTxn.reason || 'Flagged by behavioral deviation anomaly engine based on user transaction velocity.'}
+                {selectedTxn.flaggedReasons?.[0] ||
+                  'Flagged by behavioral deviation anomaly engine based on user transaction velocity.'}
               </div>
             </div>
 

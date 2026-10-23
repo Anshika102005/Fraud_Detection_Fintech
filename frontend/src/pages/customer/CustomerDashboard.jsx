@@ -36,7 +36,7 @@ import {
 
 export default function CustomerDashboard() {
   const { user } = useAuth();
-  const { transactions, alerts, kpis, isEmptyMode, toggleEmptyMode, restoreDemoData } = useTransactions();
+  const { transactions, alerts, kpis, isEmptyMode, toggleEmptyMode } = useTransactions();
   const navigate = useNavigate();
 
   const firstName = user?.name ? user.name.split(' ')[0] : 'User';
@@ -82,23 +82,6 @@ export default function CustomerDashboard() {
             </Link>
           </div>
 
-          <div style={{ marginTop: '24px' }}>
-            <button
-              onClick={restoreDemoData}
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.12)',
-                color: '#60a5fa',
-                padding: '8px 18px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                fontWeight: '600',
-              }}
-            >
-              Explore Demo Data
-            </button>
-          </div>
         </div>
       </div>
     );

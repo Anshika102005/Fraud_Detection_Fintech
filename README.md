@@ -71,11 +71,13 @@ label-backed metric degradation — every retrain must re-pass the promotion gat
 
 ### 3. FraudGuard AI prototype (`fraudguard-ai/` + `frontend/`)
 
-A demo product shell: React 18 + Vite SPA with credential login (customer
-**Anshika** / analyst **Vikram**, role-based routing), talking to the prototype
-FastAPI blueprint at `/api/v1` with Bearer auth. Requests time out after 6 s and
-fall back to **localStorage mocks**, so the demo runs with zero infrastructure.
-Seeded demo data lives in `frontend/src/data/indianData.js`.
+A React 18 + Vite SPA with role-based credential login (customer / analyst,
+role resolved server-side), talking to the FastAPI API at `/api/v1` with Bearer
+auth. All dashboard data — transactions, fraud alerts, analytics, reports, and
+the analyst investigation queue — is read from the backend SQLite database
+after authentication. No accounts or datasets are seeded: customers
+self-register on the Secure Login Portal and analysts are provisioned with
+`scripts/create_analyst.py`.
 
 ## Project layout
 

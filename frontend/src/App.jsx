@@ -172,6 +172,7 @@ export default function App() {
                 <Route path="/how-it-works" element={<LandingPage />} />
                 <Route path="/safety" element={<SafetyCenter />} />
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/login/:role" element={<LoginPage />} />
 
                 {/* Customer Portal */}
                 <Route

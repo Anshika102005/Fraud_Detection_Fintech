@@ -124,7 +124,7 @@ export default function MonthlyReport() {
               Personal Safety Rating: {report.safetyRating}
             </h3>
             <p style={{ margin: 0, fontSize: '0.875rem', color: '#94a3b8', lineHeight: '1.5' }}>
-              Your account maintained strong behavioral consistency throughout {report.month}. 2 fraudulent collect vectors were successfully deflected.
+              {report.summary}
             </p>
           </div>
         </div>
@@ -175,6 +175,7 @@ export default function MonthlyReport() {
         </div>
 
         {/* Highest Risk Transaction Flagged */}
+        {report.metrics.highestRiskTransaction ? (
         <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '14px', padding: '18px', marginBottom: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444', fontWeight: '700', fontSize: '0.9rem' }}>
@@ -189,9 +190,20 @@ export default function MonthlyReport() {
             {report.metrics.highestRiskTransaction.merchant} — ₹{report.metrics.highestRiskTransaction.amount.toLocaleString('en-IN')}
           </div>
           <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '4px' }}>
-            Ref: {report.metrics.highestRiskTransaction.id} (Unsolicited UPI collect attempt blocked)
+            Ref: {report.metrics.highestRiskTransaction.id}
           </div>
         </div>
+        ) : (
+        <div style={{ background: 'rgba(16, 185, 129, 0.06)', border: '1px solid rgba(16, 185, 129, 0.25)', borderRadius: '14px', padding: '18px', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', fontWeight: '700', fontSize: '0.9rem' }}>
+            <CheckCircle2 size={16} />
+            <span>No flagged transactions this period</span>
+          </div>
+          <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '6px' }}>
+            Nothing exceeded the risk threshold for {report.month}.
+          </div>
+        </div>
+        )}
 
         {/* Security Highlights */}
         <div style={{ marginBottom: '24px' }}>
