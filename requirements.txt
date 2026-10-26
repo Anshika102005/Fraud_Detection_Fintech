@@ -1,33 +1,50 @@
-# Core ML
+# =============================================================================
+# Fraud Detection Fintech — Production Requirements
+# Generated: 2026-10-25
+# python: >=3.11
+# Install: pip install -r requirements.txt
+# =============================================================================
+
+# ---------------- Core ML & Data ----------------
 numpy>=1.26
 pandas>=2.1
+scipy>=1.12
 scikit-learn>=1.4
 xgboost>=2.0
 lightgbm>=4.3
 optuna>=3.5
 shap>=0.45
+joblib>=1.3
 mlflow>=2.12
-scipy>=1.12
+mlflow-skinny>=2.12
+evidently>=0.4
+imbalanced-learn>=0.14
 
-# Data layer
+# ---------------- Database & Async ----------------
 psycopg[binary]>=3.1
 asyncpg>=0.29
-sqlalchemy>=2.0
+SQLAlchemy>=2.0
 
-# API
+# ---------------- API & Web ----------------
 fastapi>=0.110
 uvicorn[standard]>=0.29
 pydantic>=2.6
 pydantic-settings>=2.2
-redis>=5.0
 slowapi>=0.1.9
+python-multipart>=0.0.6
+
+# ---------------- Caching & State ----------------
+redis>=5.0
+
+# ---------------- Observability ----------------
 prometheus-client>=0.20
 httpx>=0.27
 
-# Monitoring
-evidently>=0.4
-
-# Dev / test
+# ---------------- Dev / Test ----------------
 pytest>=8.0
 pytest-asyncio>=0.23
 ruff>=0.4
+
+# ---------------- MLflow extras ----------------
+# (Separate from base: adds db + s3 glacier support for MLflow registry)
+
