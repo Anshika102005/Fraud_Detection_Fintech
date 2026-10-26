@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from src.config import ROOT, load_model_config
+from src.config import load_model_config
 
 
 def main() -> int:
@@ -27,6 +27,7 @@ def main() -> int:
 
     import mlflow
     from mlflow.tracking import MlflowClient
+
     from src.config import get_settings
 
     s = get_settings()

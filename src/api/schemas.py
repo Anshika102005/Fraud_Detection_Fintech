@@ -6,10 +6,10 @@ schema names, validates amount > 0 and timestamp skew, ignores unknown extras.
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class TransactionRequest(BaseModel):
@@ -52,7 +52,7 @@ class TransactionRequest(BaseModel):
     @field_validator("txn_ts")
     @classmethod
     def _reject_far_future(cls, v: datetime) -> datetime:
-        now = datetime.now(timezone.utc) if v.tzinfo else datetime.utcnow()
+        now = datetime.now(UTC) if v.tzinfo else datetime.utcnow()
         if v > now + timedelta(minutes=5):
             raise ValueError("transaction_timestamp is in the future beyond 5-min skew")
         return v

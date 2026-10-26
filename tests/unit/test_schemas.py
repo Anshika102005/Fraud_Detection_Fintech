@@ -1,7 +1,7 @@
 """Pydantic contracts: garbage never reaches the scoring engine."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from pydantic import ValidationError
@@ -34,7 +34,7 @@ def test_rejects_non_positive_amount():
 
 
 def test_rejects_future_timestamp_beyond_skew():
-    future = datetime.now(timezone.utc) + timedelta(minutes=30)
+    future = datetime.now(UTC) + timedelta(minutes=30)
     with pytest.raises(ValidationError):
         TransactionRequest(**_base(transaction_timestamp=future.isoformat()))
 

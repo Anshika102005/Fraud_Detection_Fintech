@@ -16,7 +16,7 @@ def get_engine(database_url: str) -> Engine:
 
 def apply_sql_file(engine: Engine, path: str) -> None:
     """Execute a .sql file as one or more statements (idempotent DDL assumed)."""
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         sql = f.read()
     with engine.begin() as conn:
         conn.execute(text(sql))

@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import json
 import math
-from bisect import bisect_left, insort
+from bisect import insort
 from collections import deque
 
 import numpy as np
@@ -96,7 +96,7 @@ class CustomerState:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "CustomerState":
+    def from_dict(cls, d: dict) -> CustomerState:
         s = cls()
         s.events = deque(d.get("events", []))
         s.totals = d.get("totals", s.totals)

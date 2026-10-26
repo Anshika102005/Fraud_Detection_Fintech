@@ -4,8 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from src.api.auth import rate_limit, require_api_key
-from src.api.schemas import BatchRequest, BatchResponse, PredictionResponse, \
-    TransactionRequest
+from src.api.schemas import BatchRequest, BatchResponse, PredictionResponse, TransactionRequest
 
 router = APIRouter(tags=["scoring"])
 

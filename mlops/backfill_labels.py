@@ -37,6 +37,7 @@ def main() -> None:
         return
 
     from sqlalchemy import text
+
     from src.data.db import get_engine
     engine = get_engine(url)
     updated = 0

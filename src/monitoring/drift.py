@@ -7,7 +7,7 @@ Thresholds (blueprint §9): PSI > 0.25 investigate, PSI > 0.5 page.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import numpy as np
 import pandas as pd
@@ -102,7 +102,7 @@ class DriftMonitor:
                          "mean_shift_std": None if not np.isfinite(shift) else round(shift, 3),
                          "status": status}
         return {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "window_rows": int(len(current)),
             "features": out,
             "summary": {"page": page, "investigate": investigate,

@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from src.config import Settings
@@ -35,7 +35,7 @@ class PredictionLogger:
 
     def log(self, record: dict) -> None:
         record = {**record,
-                  "logged_at": datetime.now(timezone.utc).isoformat()}
+                  "logged_at": datetime.now(UTC).isoformat()}
         if self.mode == "postgres" and self._engine is not None:
             from sqlalchemy import text
             with self._engine.begin() as conn:
@@ -62,7 +62,7 @@ class PredictionLogger:
         """Read recent logs (drift monitoring input). JSONL mode only."""
         if self.mode != "jsonl" or not self.path.exists():
             return []
-        with open(self.path, "r", encoding="utf-8") as f:
+        with open(self.path, encoding="utf-8") as f:
             lines = f.readlines()[-limit:]
         out = []
         for line in lines:

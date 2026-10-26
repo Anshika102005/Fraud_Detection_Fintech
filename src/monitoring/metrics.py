@@ -12,7 +12,7 @@ from __future__ import annotations
 import numpy as np
 
 try:  # pragma: no cover - exercised only when the lib is installed
-    from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram
+    from prometheus_client import Counter, Gauge, Histogram
     from prometheus_client import generate_latest as _generate_latest
 
     HAS_PROM = True

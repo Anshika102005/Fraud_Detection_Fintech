@@ -12,7 +12,7 @@ import hashlib
 import hmac
 import secrets
 import sqlite3
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -124,7 +124,7 @@ class UserStore:
             return None
         if role not in ("customer", "analyst"):
             raise ValueError(f"unsupported role: {role}")
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         with self._connect() as conn:
             conn.execute(
                 """
@@ -141,7 +141,7 @@ class UserStore:
         return public_user(self.get_user(user_id))  # type: ignore[arg-type]
 
     def touch_login(self, user_id: str) -> None:
-        stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        stamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC")
         with self._connect() as conn:
             conn.execute(
                 "UPDATE users SET last_login = ? WHERE id = ?", (stamp, user_id)
@@ -158,7 +158,7 @@ class UserStore:
 
     def create_session(self, user_id: str, ttl_hours: int) -> str:
         token = secrets.token_urlsafe(32)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         with self._connect() as conn:
             conn.execute(
                 "INSERT INTO sessions (token_hash, user_id, created_at, expires_at) "
@@ -175,7 +175,7 @@ class UserStore:
         if not token:
             return None
         token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._connect() as conn:
             return conn.execute(
                 """
@@ -192,6 +192,6 @@ class UserStore:
             conn.execute("DELETE FROM sessions WHERE token_hash = ?", (token_hash,))
 
     def purge_expired_sessions(self) -> None:
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         with self._connect() as conn:
             conn.execute("DELETE FROM sessions WHERE expires_at <= ?", (now,))

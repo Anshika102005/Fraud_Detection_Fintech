@@ -113,7 +113,7 @@ def _inject_fraud(legit: pd.DataFrame, cust_df: pd.DataFrame, merch_df: pd.DataF
     ecom_mccs = [5732, 5734, 5968, 5944, 5999]
     episodes: list[dict] = []
     quota = int(len(legit) * target_rate / (1 - target_rate))
-    cust_idx = {c.customer_id: i for i, c in enumerate(cust_df.itertuples())}
+    {c.customer_id: i for i, c in enumerate(cust_df.itertuples())}
     # Anchor episodes at a RANDOM past transaction of the victim (NOT the last):
     # anchoring at the last txn would cluster all frauds at the timeline's end,
     # starving early time-folds of positives (a classic synthetic-data trap).
@@ -137,7 +137,7 @@ def _inject_fraud(legit: pd.DataFrame, cust_df: pd.DataFrame, merch_df: pd.DataF
             new_dev = f"devF{rng.integers(0, 10**6)}"
             for j in range(burst_n + 1):
                 mi = int(rng.choice(merch_by_mcc.get(int(rng.choice(ecom_mccs)), [0])))
-                merch = merch_df.iloc[mi]
+                merch_df.iloc[mi]
                 ts = t0 + pd.Timedelta(seconds=float(rng.integers(15, 120))) * j
                 cash_out = j == burst_n
                 episodes.append(dict(
@@ -268,7 +268,7 @@ def _build_legit(cust_df: pd.DataFrame, merch_df: pd.DataFrame, start: pd.Timest
             "ip_address": [f"10.{city_code.get(ct, 0) % 250}.{rng.integers(1, 254)}."
                            f"{rng.integers(1, 254)}" for ct in city],
             "ip_risk_score": np.round(rng.beta(2, 20, n) * 0.4, 3),
-            "device_age_days": np.nan, "authentication_method": auth,
+            "authentication_method": auth,
             "cvv_result": np.where(rng.random(n) < 0.97, "match", "mismatch"),
             "pin_verified": np.where(channel == "atm", rng.random(n) < 0.98, False),
             "threeds_result": np.where(channel == "ecom",

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-
 from src.api.auth import require_admin_key
 from src.api.schemas import HealthResponse, ReadyResponse
 from src.monitoring.metrics import render_metrics
