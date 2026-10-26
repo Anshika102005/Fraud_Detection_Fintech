@@ -28,9 +28,6 @@ __pycache__/
 .ruff_cache/
 .ipynb_checkpoints/
 
-# --- legacy demo app (kept for reference) ---
-application_data.csv
-previous_application.csv
 
 # --- ide ---
 .qodo/

@@ -8,7 +8,7 @@
 #   5. python setup.py seed          (generate synthetic dataset)
 #   6. python setup.py train         (train the model → model_bundle.joblib)
 #   7. python setup.py api           (start the FastAPI server on :8000)
-#   8. python setup.py test          (run the full test suite: 35 tests)
+#   8. python setup.py test          (run the full test suite)
 #   9. python setup.py compose-up    (start full stack: api, postgres, redis, mlflow, trainer, prometheus, grafana)
 # =============================================================================
 

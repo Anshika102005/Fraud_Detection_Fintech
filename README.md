@@ -69,7 +69,7 @@ Monitoring closes the loop: the **Drift Monitor** computes PSI on served feature
 from the prediction logs, and retraining triggers fire on PSI breach or
 label-backed metric degradation — every retrain must re-pass the promotion gates.
 
-### 3. FraudGuard AI prototype (`fraudguard-ai/` + `frontend/`)
+### 3. FraudGuard AI web app (`frontend/`)
 
 A React 18 + Vite SPA with role-based credential login (customer / analyst,
 role resolved server-side), talking to the FastAPI API at `/api/v1` with Bearer
@@ -92,7 +92,6 @@ self-register on the Secure Login Portal and analysts are provisioned with
 | `src/data/` | Synthetic generation, schema migration, DB engine, validators |
 | `mlops/` | Registry promotion gates; label backfill |
 | `configs/` | `model.yaml` (folds, embargo, gates), `risk_policy.yaml` |
-| `fraudguard-ai/backend/` | Prototype FastAPI blueprint (auth, transactions, alerts, predictions) |
 | `frontend/` | React SPA (Vite, react-router, credential auth) — see `frontend/README.md` for demo credentials |
 | `docker-compose.yml` | api · postgres · redis · mlflow · trainer · prometheus · grafana |
 | `tests/` | Unit, integration, and the leakage suite (serving-consistency, no-future-leakage) |
@@ -154,7 +153,7 @@ Ops endpoints: `/health` (liveness), `/ready` (model loaded), `/metrics`
 ## Testing
 
 ```bash
-make test          # 35 tests: unit, integration, leakage suite
+make test          # unit, integration and leakage suites (81 tests)
 make lint          # ruff
 ```
 
