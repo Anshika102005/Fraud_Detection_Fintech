@@ -13,7 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import joblib
@@ -21,7 +21,6 @@ import numpy as np
 import pandas as pd
 
 from src.config import ROOT, load_model_config, load_risk_policy
-from src.features import registry as reg
 from src.features.builder import build_dataset
 from src.models.evaluate import evaluate_fraud
 from src.models.threshold import RiskPolicy, optimize_threshold
@@ -177,7 +176,7 @@ def build_bundle(model, model_type, X, y, feats, th, policy, val_metrics,
         "merchant_smoothing": cfg.get("merchant_smoothing", {}),
         "woe_smoothing": cfg.get("woe_smoothing", 50),
         "metadata": {
-            "trained_at": datetime.now(timezone.utc).isoformat(),
+            "trained_at": datetime.now(UTC).isoformat(),
             "n_rows": int(len(y)),
             "fraud_rate": float(y.mean()),
             "data_start": str(feats["txn_ts"].min()),

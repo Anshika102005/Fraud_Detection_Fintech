@@ -52,7 +52,7 @@ class RiskPolicy:
         self.bands = sorted(bands, key=lambda b: b["max_p"])
 
     @classmethod
-    def from_config(cls, policy_cfg: dict) -> "RiskPolicy":
+    def from_config(cls, policy_cfg: dict) -> RiskPolicy:
         return cls(policy_cfg["bands"])
 
     def evaluate(self, prob: float) -> tuple[str, str]:
