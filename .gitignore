@@ -15,7 +15,7 @@ reports/
 
 # --- artifacts / models / experiments ---
 artifacts/
-models/
+/models/
 mlruns/
 mlflow-artifacts/
 
